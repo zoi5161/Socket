@@ -1,0 +1,265 @@
+# Send CC
+def send_CC(recipient_CC):
+    # Send HELO command and print server response.
+    heloCommand = 'EHLO [127.0.0.1]\r\n'
+    clientSocket.send(heloCommand.encode(FORMAT))
+    recv1 = clientSocket.recv(1024).decode()
+    print(recv1)
+
+    if recv1[:3] != '250':
+        print('250 reply not received from server.')
+
+    # Send MAIL FROM command and print server response.
+    send = 'MAIL FROM:<baomun221@gmail.com>\r\n';
+    clientSocket.send(send.encode(FORMAT));
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    if (recv[:3] != '250'):
+        print('250 reply not received from server.');
+        
+    for i in recipient_CC:
+        send = 'RCPT TO:<' + i + '>\r\n';
+        clientSocket.send(send.encode(FORMAT));
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+    
+    send = 'DATA\r\n';
+    clientSocket.send(send.encode(FORMAT));
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    if (recv[:3] != '354'):
+        print('354 reply not received from server');
+
+    # Data mail: 
+    for i in recipient_CC:
+        clientSocket.send(b'CC:' + i.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'From:' + sender.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'Subject:' + subject.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'Content-Type:text/plain;charset=UTF-8;format=flowed' + b'\r\n');
+    clientSocket.send(b'\r\n'); # DÒNG TRỐNG PHÂN CÁCH HEADER VÀ NỘI DUNG MAIL
+
+    clientSocket.send(message.encode(FORMAT) + b'\r\n');
+    # Message ends with a single period.
+    clientSocket.send(b'.\r\n');
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    # Send QUIT command and get server response.
+    clientSocket.send(b'QUIT\r\n')
+    recv_quit = clientSocket.recv(1024).decode()
+    print(recv_quit)
+    
+# Send BCC
+def send_BCC(recipient_BCC, clientSocket):
+    clientSocket.close()
+    for i in recipient_BCC:
+        clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+        clientSocket.connect((mailserver, SERVER_PORT))
+
+        recv = clientSocket.recv(1024).decode()
+        print(recv)
+        if recv[:3] != '220':
+            print('220 reply not received from server.')
+    
+        # Send HELO command and print server response.
+        heloCommand = 'EHLO [127.0.0.1]\r\n'
+        clientSocket.send(heloCommand.encode(FORMAT))
+        recv1 = clientSocket.recv(1024).decode()
+        print(recv1)
+
+        if recv1[:3] != '250':
+            print('250 reply not received from server.')
+
+        # Send MAIL FROM command and print server response.
+        send = 'MAIL FROM:<baomun221@gmail.com>\r\n';
+        clientSocket.send(send.encode(FORMAT));
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+
+        if (recv[:3] != '250'):
+            print('250 reply not received from server.');
+        send = 'RCPT TO:<' + i + '>\r\n';
+        clientSocket.send(send.encode(FORMAT));
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+    
+        send = 'DATA\r\n';
+        clientSocket.send(send.encode(FORMAT));
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+
+        if (recv[:3] != '354'):
+            print('354 reply not received from server');
+
+        # Data mail: 
+        clientSocket.send(b'BCC:' + i.encode(FORMAT) + b'\r\n');
+        clientSocket.send(b'From:' + sender.encode(FORMAT) + b'\r\n');
+        clientSocket.send(b'Subject:' + subject.encode(FORMAT) + b'\r\n');
+        clientSocket.send(b'Content-Type:text/plain;charset=UTF-8;format=flowed' + b'\r\n');
+        clientSocket.send(b'\r\n'); # DÒNG TRỐNG PHÂN CÁCH HEADER VÀ NỘI DUNG MAIL
+
+        clientSocket.send(message.encode(FORMAT) + b'\r\n');
+        # Message ends with a single period.
+        clientSocket.send(b'.\r\n');
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+
+        # Send QUIT command and get server response.
+        clientSocket.send(b'QUIT\r\n')
+        recv_quit = clientSocket.recv(1024).decode()
+        print(recv_quit)
+
+
+'''
+import socket
+
+
+FORMAT = "utf8";
+SERVER_PORT = 2225;
+
+msg = "\r\n I love computer networks!"
+endmsg = "\r\n.\r\n"
+# Choose a mail server (e.g. Google mail server) and call it mailserver
+mailserver = '127.0.0.1';
+# Create socket called clientSocket and establish a TCP connection with mailserver
+clientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
+clientSocket.connect((mailserver, SERVER_PORT))
+
+recv = clientSocket.recv(1024).decode()
+print(recv)
+if recv[:3] != '220':
+    print('220 reply not received from server.')
+
+# Send HELO command and print server response.
+heloCommand = 'EHLO [127.0.0.1]\r\n'
+clientSocket.send(heloCommand.encode(FORMAT))
+recv1 = clientSocket.recv(1024).decode()
+print(recv1)
+
+if recv1[:3] != '250':
+    print('250 reply not received from server.')
+
+# Send MAIL FROM command and print server response.
+# Fill in start
+send = 'MAIL FROM:<baomun221@gmail.com>\r\n';
+clientSocket.send(send.encode(FORMAT));
+recv = clientSocket.recv(1024).decode();
+print(recv);
+
+if (recv[:3] != '250'):
+    print('250 reply not received from server.');
+    
+# Fill in end
+# Send RCPT TO command and print server response.
+# Fill in start
+
+
+
+
+# chuẩn bị  tai khoan email:
+list = []
+
+list.append('baomun221@gmail.com')
+list.append('vantai327@gmail.com')
+
+
+
+# chuẩn bị dữ liệu email:
+sender = list[0]
+recipient_To = list[1]
+list_CC = list
+list_BCC = 'vantai327@gmail.com, baomun221@gmail.com'
+subject = 'New EMAIL'
+message = 'THIS IS A TEST EMAIL'
+
+def gui_TO(recipient_To):
+    send = 'RCPT TO:<' + recipient_To + '>\r\n';
+    clientSocket.send(send.encode(FORMAT));
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+    
+    send = 'DATA\r\n';
+    clientSocket.send(send.encode(FORMAT));
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    if (recv[:3] != '354'):
+        print('354 reply not received from server');
+
+    #goi du lieu mail: 
+    clientSocket.send(b'To:' + recipient_To.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'From:' + sender.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'Subject:' + subject.encode(FORMAT) + b'\r\n');
+    clientSocket.send(b'Content-Type:text/plain;charset=UTF-8;format=flowed' + b'\r\n');
+    clientSocket.send(b'\r\n'); # DÒNG TRỐNG PHÂN CÁCH HEADER VÀ NỘI DUNG MAIL
+
+    clientSocket.send(message.encode(FORMAT) + b'\r\n');
+    # Message ends with a single period.
+    clientSocket.send(b'.\r\n');
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    # Send QUIT command and get server response.
+    clientSocket.send(b'QUIT\r\n')
+    recv_quit = clientSocket.recv(1024).decode()
+    print(recv_quit)
+    
+def gui_CC(list_CC):
+    
+    for i in list_CC:
+        send = 'RCPT TO:<' + i + '>\r\n';
+        clientSocket.send(send.encode(FORMAT));
+        recv = clientSocket.recv(1024).decode();
+        print(recv);
+    
+    send = 'DATA\r\n';
+    clientSocket.send(send.encode(FORMAT));
+    recv = clientSocket.recv(1024).decode();
+    print(recv);
+
+    if (recv[:3] != '354'):
+        print('354 reply not received from server');
+
+    #goi du lieu mail: 
+    for i in list_CC:
+        clientSocket.send(b'CC:' + i.encode(FORMAT) + b'\r\n')
+    clientSocket.send(b'From:' + sender.encode(FORMAT) + b'\r\n')
+    clientSocket.send(b'Subject:' + subject.encode(FORMAT) + b'\r\n')
+    clientSocket.send(b'Content-Type:multipart/mixed; boundary="boundary"\r\n\r\n')
+
+    # Gửi phần text của email
+    clientSocket.send(b'--boundary\r\n')
+    clientSocket.send(b'Content-Type:text/plain;charset=UTF-8;format=flowed\r\n\r\n')
+    clientSocket.send(message.encode(FORMAT) + b'\r\n')
+
+    # Đọc nội dung của file.txt và mã hóa base64
+    attachment_path = 'C:\\Users\\ACER\\Desktop\\helo.txt'  # Đường dẫn đến file đính kèm
+    with open(attachment_path, 'rb') as attachment_file:
+        attachment_data = attachment_file.read()
+    encoded_attachment = base64.b64encode(attachment_data).decode(FORMAT)  # Mã hóa base64
+
+    # Gửi phần đính kèm của email
+    clientSocket.send(b'--boundary\r\n')
+    clientSocket.send(f'Content-Type:application/octet-stream; name="file.txt"\r\n'.encode(FORMAT))
+    clientSocket.send(b'Content-Disposition:attachment; filename="file.txt"\r\n')
+    clientSocket.send(f'Content-Transfer-Encoding: base64\r\n\r\n'.encode(FORMAT))
+    clientSocket.send(encoded_attachment.encode(FORMAT) + b'\r\n')
+
+    # Kết thúc email
+    clientSocket.send(b'--boundary--\r\n.\r\n')
+
+    recv = clientSocket.recv(1024).decode()
+    print(recv)
+
+    # Send QUIT command and get server response.
+    clientSocket.send(b'QUIT\r\n')
+    recv_quit = clientSocket.recv(1024).decode()
+    print(recv_quit)
+
+gui_CC(list_CC)
+
+# Đóng socket
+clientSocket.close()
+'''
